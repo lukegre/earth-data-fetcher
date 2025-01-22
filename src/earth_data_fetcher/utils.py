@@ -3,6 +3,7 @@ import munch
 from .download_dataset import DownloaderLazyXarray
 from .download_https import DownloaderFsspec
 from typing import Union
+from loguru import logger
 
 
 def read_sources(fname_yaml:str)->munch.Munch:
@@ -55,8 +56,10 @@ def make_downloader(config:dict)->Union[DownloaderFsspec, DownloaderLazyXarray]:
         return DownloaderFsspec(**config)
     elif is_thredds_compatible or is_cmems_dataset:
         if is_thredds_compatible:
+            logger.info("Opening with pydap")
             return DownloaderLazyXarray(data_opener=pydap_opener, **config)
         elif is_cmems_dataset:
+            logger.info("Opening with copernicusmarine")
             return DownloaderLazyXarray(data_opener=cmems_opener, **config)
         else:
             raise ValueError("An impossible situation has occured 😱")

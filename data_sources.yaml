@@ -85,3 +85,41 @@ sst_oisst:
         freq: 1D
         start: 2024-07-01
     url: filecache::https://www.ncei.noaa.gov/data/sea-surface-temperature-optimum-interpolation/v2.1/access/avhrr/{t:%Y%m}/oisst-avhrr-v02r01.{t:%Y%m%d}.nc
+
+
+sss_cci:
+    url: filecache::https://dap.ceda.ac.uk/neodc/esacci/sea_surface_salinity/data/v04.41/GLOBALv4.41/7days/{t:%Y}/ESACCI-SEASURFACESALINITY-L4-SSS-GLOBAL-MERGED_OI_7DAY_RUNNINGMEAN_DAILY_0.25deg-{t:%Y%m%d}-fv4.41.nc
+    storage_options:
+        cache_storage: ../data/sss_esacci_smos/v04.41/{t:%Y}/
+        same_names: true
+    metadata: 
+        citation_info: https://catalogue.ceda.ac.uk/uuid/0d0f4a942a144d9cab9263de3949a5d6/
+        spatial_resolution: 0.25 degrees
+        temporal_resolution: daily as 7 day rolling mean
+        title: "ESA Sea Surface Salinity Climate Change Initiative (Sea_Surface_Salinity_cci): Weekly sea surface salinity product on a global grid, v04.41, for 2010 to 2022"
+        version: v4.41
+    time: 
+        start: 2010-01-01
+        end: 2022-10-30
+        freq: 1D
+
+
+chl_globcolour:
+    url: filecache::https://s3.waw3-1.cloudferro.com/mdl-native-16/native/OCEANCOLOUR_GLO_BGC_L4_MY_009_104/cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D_202311/{t:%Y}/{t:%m}/{t:%Y%m%d}_cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D.nc
+    storage_options:
+        cache_storage: ../data/chl_cmems_globcolour/cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D/{t:%Y}/
+        same_names: true
+    metadata:
+        doi: https://doi.org/10.48670/moi-00281
+        spatial_resolution: 4 km
+        temporal_resolution: 1 day
+        title: Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L4 (monthly and interpolated) from Satellite Observations
+    time:  # 1 Sep 1997 to 14 Jan 2025
+        start: 1997-09-01
+        end: 2025-01-01
+        freq: 1D
+    variables:
+        CHL: chl_globcolour
+        CHL_uncertainty: chl_globcolour_uncert
+        flags: chl_globcolour_flags
+        

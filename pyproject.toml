@@ -12,8 +12,9 @@ dependencies = [
     "loguru>=0.7",
     "munch>=3",
     "pip>=23",
-    "pydap>=3.3",
+    "pydap>=3.5.3",
     "python-dotenv>=1.0",
     "requests>=2",
     "s3fs>=2024",
+    "tenacity>=9.0.0",
 ]

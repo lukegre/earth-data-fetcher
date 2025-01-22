@@ -66,7 +66,6 @@ class DownloaderLazyXarray:
             raise ValueError("storage_options.cache_storage must be defined in the kwargs")
         
         fname = pathlib.Path(fname)
-        fname.parent.mkdir(parents=True, exist_ok=True)
 
         return fname
     
@@ -74,8 +73,9 @@ class DownloaderLazyXarray:
     def data(self):
         if self._data is None:
             logger.debug("Opening data for the first time, may take some time")
-            vars = list(self._kwargs.get('variables', None))
             self._data_all_vars = self.data_opener(self._kwargs['url'])
+            vars = list(self._kwargs.get('variables', []))
+            assert len(vars) > 0, "variables must be defined in config"
             self._data = self._data_all_vars[vars]
         return self._data
     
@@ -101,6 +101,8 @@ class DownloaderLazyXarray:
             
             logger.debug(f"Saving data to {fname}")
             compress = dict(zlib=True, dtype='float32')
+            fname.parent.mkdir(parents=True, exist_ok=True)
+
             ds.to_netcdf(
                 path=fname, 
                 encoding={k: compress for k in ds.data_vars}, 
