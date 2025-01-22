@@ -1,22 +1,19 @@
 [project]
 name = "earth-data-fetcher"
-version = "0.1.0"
+version = "0.1.2"
 description = "Fetch remote sensing and reanalysis data from different sources"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
-    "aiohttp>=3.11.11",
+    "aiohttp>=3.10",
     "copernicusmarine>=2.0.0",
-    "fsspec>=2024.12.0",
-    "jinja2>=3.1.5",
-    "loguru>=0.7.3",
-    "munch>=4.0.0",
-    "pip>=24.3.1",
-    "pydap>=3.5.3",
-    "python-dotenv>=1.0.1",
-    "requests>=2.32.3",
-    "s3fs>=2024.12.0",
+    "fsspec>=2024",
+    "jinja2>=3",
+    "loguru>=0.7",
+    "munch>=3",
+    "pip>=23",
+    "pydap>=3.3",
+    "python-dotenv>=1.0",
+    "requests>=2",
+    "s3fs>=2024",
 ]
-
-[tool.setuptools]
-packages = ["src.earth_data_fetcher"]
