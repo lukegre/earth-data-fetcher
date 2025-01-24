@@ -1,0 +1,62 @@
+site_name: Earth Data Fetcher
+site_description: A Python package for downloading Earth science data as netCDF files
+theme:
+  name: readthedocs
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_source: false
+            show_root_heading: false
+            heading_level: 1
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Defining Data Sources: user-guide/data-sources.md
+    - OceanSODA-ETHZv2 sources: user-guide/oceansoda-sources.md
+  - API Reference:
+    - DownloaderFsspec: api/download_https.md
+    - DownloaderXarray: api/download_xarray.md
+  - Contributing: contributing.md
