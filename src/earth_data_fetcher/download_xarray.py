@@ -3,15 +3,39 @@ import pandas as pd
 import xarray as xr
 
 from loguru import logger
-from typing import List, Tuple, Union, Callable
+from typing import List, Union, Callable
 
 
-class DownloaderLazyXarray:
+class DownloaderXarray:
     """
     A superclass for zarr files on S3 and GCS, as well as thread/DAP-based data
-    """
-    def __init__(self, data_opener:Callable, **kwargs) -> None:
 
+    Parameters
+    ----------
+    data_opener : Callable
+        A function that takes a string (the url to the data) and returns an xarray.Dataset
+    **kwargs
+        Additional keyword arguments to pass to the data opener
+
+    Attributes
+    ----------
+    data_opener : Callable
+        The function that opens the data
+    _kwargs : dict
+        The additional keyword arguments to pass to the data opener
+    _data : xarray.Dataset or None
+        The data that has been downloaded, or None if no data has been downloaded
+    """
+
+    def __init__(self, data_opener:Callable, **kwargs) -> None:
+        """
+        Parameters
+        ----------
+        data_opener : Callable
+            A function that takes a string (the url to the data) and returns an xarray.Dataset
+        **kwargs
+            Additional keyword arguments to pass to the data opener
+        """
         self.data_opener = data_opener
         self._kwargs = kwargs
 
@@ -20,12 +44,25 @@ class DownloaderLazyXarray:
 
     def _check_cache_storage_path_valid(self)->None:
         """
-        Checks if the cache storage path is valid with the following criteria:
+        Check if the cache storage path is valid.
+
+        This method validates the cache storage path based on the following criteria:
         - Must be a string
         - Must not be empty
         - Must contain '{t:...}' to be formatted with the time
         - Must not contain any '*' characters
         - Must be daily formatted (return a unique file for each day)
+
+        Raises
+        ------
+        ValueError
+            If storage_options is not defined in kwargs or cache_storage is not defined in storage_options.
+        AssertionError
+            If any of the validation criteria are not met.
+
+        Returns
+        -------
+        None
         """
         storage_options = self._kwargs.get('storage_options', {})
         if storage_options == {}:
@@ -37,7 +74,9 @@ class DownloaderLazyXarray:
         assert '{t:' in fname, "storage_options.cache_storage must contain '{t:...}'"
 
         dates = pd.date_range('2000-01-01', '2000-01-09', freq='1D')
-        flist = set([fname.format(t=t, **self._kwargs) for t in dates])
+        # top level and metadata kwargs are passed to the path
+        fmt_kwargs = self._kwargs | self._kwargs.get('metadata', {}) 
+        flist = set([fname.format(t=t, **fmt_kwargs) for t in dates])
         assert len(flist) == len(dates), "storage_options.cache_storage must return a unique file for each day"
         logger.trace("Cache storage path is valid")
         
@@ -60,7 +99,9 @@ class DownloaderLazyXarray:
         if storage_options == {}:
             raise ValueError("storage_options must be defined in the kwargs")
         fname = storage_options.get('cache_storage', '')
-        fname = fname.format(t=t, **self._kwargs)
+        # top level and metadata kwargs are passed to the path
+        fmt_kwargs = self._kwargs | self._kwargs.get('metadata', {})  
+        fname = fname.format(t=t, **fmt_kwargs)
         
         if fname == '':
             raise ValueError("storage_options.cache_storage must be defined in the kwargs")
@@ -114,6 +155,25 @@ class DownloaderLazyXarray:
         return str(fname)
 
     def download(self, times: Union[str, pd.Timestamp, pd.DatetimeIndex, List[pd.Timestamp]])->List[str]:
+        """
+        Download data for the specified times.
+
+        Parameters
+        ----------
+        times : Union[str, pd.Timestamp, pd.DatetimeIndex, List[pd.Timestamp]]
+            The time(s) for which to download data. This can be a single timestamp as a string, 
+            a pandas Timestamp object, a list or tuple of Timestamps, or a pandas DatetimeIndex.
+
+        Returns
+        -------
+        List[str]
+            A list of file paths where the downloaded data is saved.
+
+        Raises
+        ------
+        ValueError
+            If the provided times are not in a valid format.
+        """
         
         if isinstance(times, str):
             times = [pd.Timestamp(times)]
@@ -134,11 +194,37 @@ class DownloaderLazyXarray:
         return flist
     
 
-def pydap_opener(url):
+def pydap_opener(url: str) -> xr.Dataset:
+    """
+    Open a dataset with pydap.
+
+    Parameters
+    ----------
+    url : str
+        The URL to the dataset
+
+    Returns
+    -------
+    xr.Dataset
+        The dataset
+    """
     return xr.open_dataset(url, engine='pydap')
 
 
-def cmems_opener(url):
+def cmems_opener(url: str) -> xr.Dataset:
+    """
+    Open a dataset with pydap.
+
+    Parameters
+    ----------
+    url : str
+        The URL to the dataset
+
+    Returns
+    -------
+    xr.Dataset
+        The dataset
+    """
     import copernicusmarine as cm
     import dotenv
 

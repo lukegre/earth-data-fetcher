@@ -1,6 +1,6 @@
 # reads files like data/sources.yaml to the munch data type
 import munch
-from .download_dataset import DownloaderLazyXarray
+from .download_xarray import DownloaderXarray
 from .download_https import DownloaderFsspec
 from typing import Union
 from loguru import logger
@@ -15,7 +15,7 @@ def read_sources(fname_yaml:str)->munch.Munch:
     return sources  # type: ignore
 
 
-def make_downloader(config:dict)->Union[DownloaderFsspec, DownloaderLazyXarray]:
+def make_downloader(config:dict)->Union[DownloaderFsspec, DownloaderXarray]:
     """
     Make a downloader based on the given configuration. The configuration must contain
     the following
@@ -29,7 +29,7 @@ def make_downloader(config:dict)->Union[DownloaderFsspec, DownloaderLazyXarray]:
     
     Returns
     -------
-    Union[DownloaderFsspec, DownloaderLazyXarray]
+    Union[DownloaderFsspec, DownloaderXarray]
         The downloader object that has method Downloader.download(pd.DateTimeIndex)
 
     Raises
@@ -40,7 +40,7 @@ def make_downloader(config:dict)->Union[DownloaderFsspec, DownloaderLazyXarray]:
         If the URL is not compatible with any known downloader
     """
     import re
-    from .download_dataset import cmems_opener, pydap_opener
+    from .download_xarray import cmems_opener, pydap_opener
 
     if 'url' not in config:
         raise ValueError("config must contain the key 'url'")
@@ -57,10 +57,10 @@ def make_downloader(config:dict)->Union[DownloaderFsspec, DownloaderLazyXarray]:
     elif is_thredds_compatible or is_cmems_dataset:
         if is_thredds_compatible:
             logger.info("Opening with pydap")
-            return DownloaderLazyXarray(data_opener=pydap_opener, **config)
+            return DownloaderXarray(data_opener=pydap_opener, **config)
         elif is_cmems_dataset:
             logger.info("Opening with copernicusmarine")
-            return DownloaderLazyXarray(data_opener=cmems_opener, **config)
+            return DownloaderXarray(data_opener=cmems_opener, **config)
         else:
             raise ValueError("An impossible situation has occured 😱")
     else:
